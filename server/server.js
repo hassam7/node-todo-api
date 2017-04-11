@@ -1,5 +1,6 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
+const _ = require('lodash');
 var {
     ObjectID
 } = require('mongodb');
@@ -52,7 +53,7 @@ app.get('/todos/:id', (req, res) => {
             return res.status(400).send("No record found with specified ID");
         } else {
             res.send({
-                todo: success
+                success
             })
         }
     }, (error) => {
@@ -73,6 +74,44 @@ app.delete('/todos/:id', (req, res) => {
         } else {
             res.send({
                 todo: success
+            })
+        }
+    }, (error) => {
+        return res.status(400).send({
+            error
+        });
+
+    });
+});
+
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['text', 'completed']);
+    if (!id) {
+        return res.status(400).send("No Id Specified");
+    }
+    if (!ObjectID.isValid(id)) {
+        return res.status(400).send("No Id Specified");
+    }
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = Date.now();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+    console.log(body);
+    Todo.findByIdAndUpdate(id, {
+        $set: body
+    }, {
+        new: true
+    }).then((success) => {
+    debugger;
+        
+        if (!success) {
+            return res.status(400).send("No record found with specified ID");
+        } else {
+            res.send({
+                 success
             })
         }
     }, (error) => {
