@@ -60,6 +60,28 @@ app.get('/todos/:id', (req, res) => {
     });
 });
 
+app.delete('/todos/:id', (req, res) => {
+    if (!req.params.id) {
+        return res.status(400).send("No Id Specified");
+    }
+    if (!ObjectID.isValid(req.params.id)) {
+        return res.status(400).send("No Id Specified");
+    }
+    Todo.findByIdAndRemove(req.params.id).then((success) => {
+        if (!success) {
+            return res.status(400).send("No record found with specified ID");
+        } else {
+            res.send({
+                todo: success
+            })
+        }
+    }, (error) => {
+        return res.status(400).send({
+            error
+        });
+
+    });
+});
 
 app.listen(3000, () => {
     console.log("Server started at port 3000");
