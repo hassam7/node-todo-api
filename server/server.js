@@ -87,6 +87,7 @@ app.delete('/todos/:id', (req, res) => {
 app.patch('/todos/:id', (req, res) => {
     var id = req.params.id;
     var body = _.pick(req.body, ['text', 'completed']);
+    console.log(body)
     if (!id) {
         return res.status(400).send("No Id Specified");
     }
@@ -104,9 +105,7 @@ app.patch('/todos/:id', (req, res) => {
         $set: body
     }, {
         new: true
-    }).then((success) => {
-    debugger;
-        
+    }).then((success) => {        
         if (!success) {
             return res.status(400).send("No record found with specified ID");
         } else {
@@ -121,7 +120,17 @@ app.patch('/todos/:id', (req, res) => {
 
     });
 });
-
+app.post("/users",(req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    var user = new User(body);
+    user.save().then(()=>{
+        return user.generateAuthToken();
+    }).then((token)=>{
+        res.header('x-auth',token).send(user);
+    }).catch((error=>{
+        res.status(400).send(error);
+    }))
+});
 app.listen(3000, () => {
     console.log("Server started at port 3000");
 });
