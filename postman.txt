@@ -1,0 +1,6 @@
+var token = postman.getResponseHeader('x-auth');
+postman.setEnviromentVariable('x-auth',token)
+================================================
+
+var body = JSON.parse(responseBody);
+postman.setEnviromentVariable('name',body.propertyName)
